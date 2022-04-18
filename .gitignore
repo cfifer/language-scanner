@@ -1,2 +1,3 @@
 *.exe
-git_users.txt
+*.txt
+.vscode
