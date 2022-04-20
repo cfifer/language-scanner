@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
-	"strings"
 )
 
+/*
+Reads a list of usernames from a given .txt file and query github for the users repositories, and the language
+associated with that repository. It then outputs the data into a readable JSON format into a given .json file.
+*/
 func main() {
 
 	//Declaring variables and flags to deal with cli arguments.
@@ -17,31 +19,13 @@ func main() {
 
 	flag.Parse()
 
-	//This makes the user use a .txt file. This might be a bit strict this is an assumption.
-	if !strings.HasSuffix(*inputFile, ".txt") {
-		log.Fatal("Input File is not a .txt file.")
-	}
+	//Read the user file
+	//ASSUMPTION
+	users := readFile(*inputFile)
 
-	//If file doesn't exist, we have nothing to do. Exit and notify user.
-	if _, err := os.Stat(*inputFile); err != nil {
-		log.Fatal("Input File doesn't exist!")
-	}
-
-	//Read the user file (ASSUMPTION HERE!)
-	users, err := readFile(*inputFile)
-
-	//Make sure we read the file appropriately. If something goes wrong, we can't continue
-	if err != nil {
-		log.Fatal("Error reading the file: ", err)
-	}
-
-	//Warn the user they didn't give a .json file and append it to the given filename
-	if !strings.HasSuffix(*outputFile, ".json") {
-		log.Println("Output file doesn't have the proper file format. Appending .json...")
-		*outputFile = *outputFile + ".json"
-	}
-
-	//Iterate through the list of users.
+	//Iterate through the list of users, read the repositories they have and the languages those
+	//repositories use. There are a slew of things that can go wrong and we will stop if any user
+	//returns an error. This is primarily due to the github api limiter.
 	for _, user := range users {
 		userRepo, err := readRepositories(user)
 		usersRepos = append(usersRepos, userRepo)
