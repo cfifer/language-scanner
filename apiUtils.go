@@ -75,11 +75,15 @@ func readRepositories(user string) (userRepoLanguages, error) {
 		//This is probably not the best way to do this but I find it much easier to read
 		var repos Repositories
 		var err error
+		name := strings.Split(repoURL, "/")
 
 		//Read the languages and if we hit the github rate limit (An err) return what we have so far
 		if repos, err = readLanguages(repoURL); err != nil {
 			return userRepos, err
 		}
+
+		//This is to pull the second to last from the array
+		repos.Name = name[len(name)-2]
 
 		//Append the repository information to the struct we started building
 		userRepos.Repositories = append(userRepos.Repositories, repos)
